@@ -9,6 +9,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.InputStream;
+import java.util.Map;
 
 public class CarDiagnosticEngine {
 
@@ -19,7 +20,7 @@ public class CarDiagnosticEngine {
 		 * The purpose of this method is to find any problems with a car's data or parts.
 		 *
 		 * Diagnostic Steps:
-		 *      First   - Validate the 3 data fields are present, if one or more are
+		 *      First   - Validate the 3 data fields are present, if one or more are (missing?)
 		 *                then print the missing fields to the console
 		 *                in a similar manner to how the provided methods do.
 		 *
@@ -33,13 +34,63 @@ public class CarDiagnosticEngine {
 		 * A damaged part is one that has any condition other than NEW, GOOD, or WORN.
 		 *
 		 * Important:
-		 *      If any validation fails, complete whatever step you are actively one and end diagnostics early.
+		 *      If any validation fails, complete whatever step you are actively on and end diagnostics early.
 		 *
 		 * Treat the console as information being read by a user of this application. Attempts should be made to ensure
 		 * console output is as least as informative as the provided methods.
 		 */
 
+		validateDataFields(car);
+		validateNoMissingParts(car);
+		validateWorkingParts(car);
+		System.out.println("Car diagnostics successful. No problems detected");
+	}
 
+	private void validateWorkingParts(Car car) {
+		boolean error = false;
+		for (Part part : car.getParts()) {
+			if(!part.isInWorkingCondition()){
+				error=true;
+				printDamagedPart(part.getType(),part.getCondition());
+			}
+		}
+		if(error){
+			throw new RuntimeException("Car diagnostics failed: non-working parts");
+		}
+	}
+
+	private void validateNoMissingParts(Car car) {
+		Map<PartType, Integer> missingPartsMap = car.getMissingPartsMap();
+		boolean error=false;
+		if(missingPartsMap.containsKey(PartType.ELECTRICAL)){
+			error=true;
+			printMissingPart(PartType.ELECTRICAL,missingPartsMap.get(PartType.ELECTRICAL));
+		}
+		if(missingPartsMap.containsKey(PartType.OIL_FILTER)){
+			error=true;
+			printMissingPart(PartType.OIL_FILTER,missingPartsMap.get(PartType.OIL_FILTER));
+		}
+		if(missingPartsMap.containsKey(PartType.FUEL_FILTER)){
+			error=true;
+			printMissingPart(PartType.FUEL_FILTER,missingPartsMap.get(PartType.FUEL_FILTER));
+		}
+		if(missingPartsMap.containsKey(PartType.ENGINE)){
+			error=true;
+			printMissingPart(PartType.ENGINE,missingPartsMap.get(PartType.ENGINE));
+		}
+		if(missingPartsMap.containsKey(PartType.TIRE)){
+			error=true;
+			printMissingPart(PartType.TIRE,missingPartsMap.get(PartType.TIRE));
+		}
+		if(error){
+			throw new RuntimeException("Car diagnostics failed: missing parts");
+		}
+	}
+
+	private void validateDataFields(Car car) {
+		if (car.getYear() == null) throw new IllegalArgumentException("Year must not be null");
+		if (car.getMake() == null) throw new IllegalArgumentException("Make must not be null");
+		if (car.getModel() == null) throw new IllegalArgumentException("Model must not be null");
 	}
 
 	private void printMissingPart(PartType partType, Integer count) {

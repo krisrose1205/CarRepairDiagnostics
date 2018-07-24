@@ -3,12 +3,16 @@ package com.ubiquisoft.evaluation.domain;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Car {
+
+    private static final int NUM_PARTS = 1;
+    private static final int NUM_TIRES = 4;
 
 	private String year;
 	private String make;
@@ -30,8 +34,47 @@ public class Car {
 		 *          "TIRE": 3
 		 *      }
 		 */
-
-		return null;
+        int numEngines = 0;
+        int numElectrical = 0;
+        int numFuelFilters = 0;
+        int numOilFilters = 0;
+        int numTires = 0;
+        for (Part part : parts) {
+            switch (part.getType()) {
+                case ENGINE:
+                    numEngines++;
+                    break;
+                case ELECTRICAL:
+                    numElectrical++;
+                    break;
+                case TIRE:
+                    numTires++;
+                    break;
+                case FUEL_FILTER:
+                    numFuelFilters++;
+                    break;
+                case OIL_FILTER:
+                    numOilFilters++;
+                    break;
+            }
+        }
+        Map<PartType, Integer> map = new HashMap<>();
+        if (numEngines < NUM_PARTS) {
+            map.put(PartType.ENGINE, NUM_PARTS);
+        }
+        if (numElectrical < NUM_PARTS) {
+            map.put(PartType.ELECTRICAL, NUM_PARTS);
+        }
+        if (numFuelFilters < NUM_PARTS) {
+            map.put(PartType.FUEL_FILTER, NUM_PARTS);
+        }
+        if (numOilFilters < NUM_PARTS) {
+            map.put(PartType.OIL_FILTER, NUM_PARTS);
+        }
+        if (numTires < NUM_TIRES) {
+            map.put(PartType.TIRE, NUM_TIRES - numTires);
+        }
+        return map;
 	}
 
 	@Override
